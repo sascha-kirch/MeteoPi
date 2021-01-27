@@ -6,6 +6,13 @@ MeteoPi is a weather station based on the ESP32 with a webserver running on a Ra
 ## Setup
 <img src="https://github.com/SaKi1309/MeteoPi/blob/main/imgs/IMG_3641.jpg" width="400" />
 
+The table below shows the sensors used for this project.
+Sensor | Details | Image Model
+------------ | ------------- | -------------
+Temperature and Humidity Sensor | DHT11, 16bit |  <img src="https://github.com/SaKi1309/MeteoPi/blob/main/imgs/temperatur.PNG" width="150" /> 
+Light sensor | GY-302 BH1750 |  <img src="https://github.com/SaKi1309/MeteoPi/blob/main/imgs/light.jpg" width="150" /> 
+Air quality sensor |  CCS811 HDC1080  | <img src="https://github.com/SaKi1309/MeteoPi/blob/main/imgs/co2.jpg" width="150" /> 
+Barometric pressure sensor |  GY-68 BMP180  | <img src="https://github.com/SaKi1309/MeteoPi/blob/main/imgs/baro.jpg" width="150" />
 
 ## Webinterface
 
