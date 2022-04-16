@@ -31,3 +31,6 @@ Database Management | PHPMyAdmin | ``` sudo apt-get install phpmyadmin ```
 <img src="https://github.com/SaKi1309/MeteoPi/blob/main/imgs/meteopi_graph.PNG" width="1000" />
 
 > Hint: the noise seen on the measurements is due to the compact and unoptimized layout of the setup.
+
+# Repo Stats
+![](https://komarev.com/ghpvc/?username=saschakirchmeteopi&color=yellow) since 16.04.2022
