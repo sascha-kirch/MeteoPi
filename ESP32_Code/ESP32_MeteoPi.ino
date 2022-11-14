@@ -10,7 +10,7 @@
 
 #define DHT_TYPE DHT11
 #define DHT_PIN 25
-#define VERSION 02
+#define VERSION 03
 
 Adafruit_BMP085 bmp;
 DHT dht(DHT_PIN, DHT_TYPE);
@@ -18,29 +18,48 @@ BH1750 lightMeter;
 Adafruit_CCS811 ccs;
 
 // Replace with your network credentials
-const char* ssid     = "SaSaPeKi8693";
-const char* password = "aEyfw5p5vsYx";
+const char* ssid     = "<ENTER YOUR SSID>";
+const char* password = "<ENTER YOUR WLAN PASSWORD>";
+const String server_ip = "<ENTER YOUR WEBSERVER DEVICE'S IP>";
+String clientMacAddressRefference = "<ENTER MAC-ADRESS OF YOUR CLIENT>";
 
-float temperature = 0.0f;
-float humidity = 0.0f;
-float heatIndex = 0.0f;
-double pressure = 0.0;
-uint16_t lux = 0;
-float eco2, tvoc = 0.0f;
-String clientMacAddressRefference = "";
+float temperature = NULL;
+float humidity = NULL;
+float heatIndex = NULL;
+double pressure = NULL;
+uint16_t lux = NULL;
+float eco2, tvoc = NULL;
+
+//Select which sensor are connected and should be read!
+bool sensor_dht = true;
+bool sensor_bmp = false;
+bool sensor_lightmeter = false;
+bool sensor_css = false;
+
 
 void setup() {
   Serial.begin(9600);
 
-  dht.begin();
-  bmp.begin();
-  lightMeter.begin();
-
-  if (!ccs.begin()) {
-    Serial.println("Failed to start sensor! Please check your wiring.");
+  if (sensor_dht){
+    dht.begin();
   }
 
-  while (!ccs.available());
+  if(sensor_bmp){
+    bmp.begin();
+  }
+
+  if(sensor_lightmeter){
+    lightMeter.begin();
+  }
+  
+  if(sensor_css){
+    if (!ccs.begin()) {
+      Serial.println("Failed to start sensor! Please check your wiring.");
+    }
+  
+    while (!ccs.available());
+  }
+  
   ConnectToWifi();
 }
 
@@ -65,24 +84,27 @@ void ConnectToWifi()
 }
 
 void loop() {
-  humidity = dht.readHumidity();
-  temperature = dht.readTemperature();
-  heatIndex = dht.computeHeatIndex(temperature, humidity, false);
+  if(sensor_dht){humidity = dht.readHumidity();}
+  if(sensor_dht){temperature = dht.readTemperature();}
+  if(sensor_dht){heatIndex = dht.computeHeatIndex(temperature, humidity, false);}
   //1 hPa = 100 Pa = 1 mbar = 0.001 bar
-  pressure = bmp.readPressure() / 100.0; //mbar
-  lux = lightMeter.readLightLevel();
-  if (ccs.available()) {
-    if (!ccs.readData()) {
-      Serial.println("Data read sucessfully!");
-      eco2 = ccs.geteCO2();
-      tvoc = ccs.getTVOC();
-    } else {
-      //If error ocurs, previous value is taken.
-      Serial.println("ERROR!");
+  if(sensor_bmp){pressure = bmp.readPressure() / 100.0;} //mbar
+  if(sensor_lightmeter){lux = lightMeter.readLightLevel();}
+  if(sensor_css){
+    if (ccs.available()) {
+      if (!ccs.readData()) {
+        Serial.println("Data read sucessfully!");
+        eco2 = ccs.geteCO2();
+        tvoc = ccs.getTVOC();
+      } else {
+        //If error ocurs, previous value is taken.
+        Serial.println("ERROR!");
+      }
+    }else {
+      Serial.println("Sensor not available!");
     }
-  }else {
-    Serial.println("Sensor not available!");
   }
+
 
   Serial.print("humidity = ");
   Serial.println(humidity);
@@ -99,25 +121,37 @@ void loop() {
   Serial.print("tvoc = ");
   Serial.println(tvoc);
 
+
   //Check WiFi connection status
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println("WiFi Connected. Start Upload");
 
     //Open a connection to the server
     HTTPClient http;
-    http.begin("http://192.168.0.129/meteopi/uploadData.php");
+    http.begin("http://"+server_ip+"/meteopi/uploadData.php");
     http.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    clientMacAddressRefference = "98:F4:AB:62:0B:5C";
 
-    int httpResponseCode = http.POST("temperature=" + String(temperature)
-                                     + "&humidity=" + String(humidity)
-                                     + "&heatIndex=" + String(heatIndex)
-                                     + "&pressure=" + String(pressure)
-                                     + "&lux=" + String(lux)
-                                     + "&eco2=" + String(eco2)
-                                     + "&tvoc=" + String(tvoc)
-                                     + "&clientMacAddressRefference=" + String(clientMacAddressRefference));
+    String postString = "";
+    if(sensor_dht){
+      postString += "temperature=" + String(temperature)
+                 + "&humidity=" + String(humidity)
+                 + "&heatIndex=" + String(heatIndex);
+    }
+    if(sensor_bmp){
+        postString += "&pressure=" + String(pressure);
+    } 
+    if(sensor_lightmeter){
+      postString += "&lux=" + String(lux);
+    }
+    if(sensor_css){
+      postString  += "&eco2=" + String(eco2)
+                  + "&tvoc=" + String(tvoc);
+    }
+
+    postString += "&clientMacAddressRefference=" + String(clientMacAddressRefference);
+
+    int httpResponseCode = http.POST(postString);
     Serial.print("HTTP response code:");
     if (httpResponseCode > 0) {
       //check for a return code - This is more for debugging.
