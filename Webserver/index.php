@@ -17,17 +17,50 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <base href="./" />
       <title>MeteoPi Web Interface: Dashboard</title>
+      <script type="text/javascript">
+      function setCookie(cname, cvalue, exdays) {
+        const d = new Date();
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+        let expires = "expires="+d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+      }
+
+      function getCookie(cname) {
+        let name = cname + "=";
+        let ca = document.cookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+          let c = ca[i];
+          while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+          }
+          if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+          }
+        }
+        return "";
+      }
+      </script>
+      <script type="text/javascript">
+            //Cookie can be set by changing value from 0->1. If one, respective values are loaded and displayed on the website.
+            setCookie("load_humidity","1",3)
+            setCookie("load_temperature","1",3)
+            setCookie("load_heatindex","1",3)
+            setCookie("load_pressure","0",3)
+            setCookie("load_lux","0",3)
+            setCookie("load_eco","0",3)
+            setCookie("load_tvoc","0",3)           
+      </script>
       <script type="text/javascript" src="https://www.google.com/jsapi"></script>
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
       <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
       <script type="text/javascript">
          google.charts.load('current', {'packages':['corechart','annotationchart']});
-           google.charts.setOnLoadCallback(drawChart_humidity);
-           google.charts.setOnLoadCallback(drawChart_temperature);
-           google.charts.setOnLoadCallback(drawChart_pressure);
-           google.charts.setOnLoadCallback(drawChart_lux);
-           google.charts.setOnLoadCallback(drawChart_eco2);
-           google.charts.setOnLoadCallback(drawChart_tvoc);
+           if(getCookie("load_humidity")=="1"){google.charts.setOnLoadCallback(drawChart_humidity);}
+           if(getCookie("load_temperature")=="1"){google.charts.setOnLoadCallback(drawChart_temperature);}
+           if(getCookie("load_pressure")=="1"){google.charts.setOnLoadCallback(drawChart_pressure);}
+           if(getCookie("load_lux")=="1"){google.charts.setOnLoadCallback(drawChart_lux);}
+           if(getCookie("load_eco")=="1"){google.charts.setOnLoadCallback(drawChart_eco2);}
+           if(getCookie("load_tvoc")=="1"){google.charts.setOnLoadCallback(drawChart_tvoc);}
          
            
          function drawChart_humidity() {
@@ -302,13 +335,13 @@
       </script>
       <script type="text/javascript">
          google.charts.load('current', {'packages':['gauge']});
-           google.charts.setOnLoadCallback(drawGauge_humidity);
-           google.charts.setOnLoadCallback(drawGauge_temperature);
-           google.charts.setOnLoadCallback(drawGauge_heatIndex);
-           google.charts.setOnLoadCallback(drawGauge_pressure);
-           google.charts.setOnLoadCallback(drawGauge_lux);
-           google.charts.setOnLoadCallback(drawGauge_eco2);
-           google.charts.setOnLoadCallback(drawGauge_tvoc);
+           if(getCookie("load_humidity")=="1"){google.charts.setOnLoadCallback(drawGauge_humidity);}
+           if(getCookie("load_temperature")=="1"){google.charts.setOnLoadCallback(drawGauge_temperature);}
+           if(getCookie("load_heatindex")=="1"){google.charts.setOnLoadCallback(drawGauge_heatIndex);}
+           if(getCookie("load_pressure")=="1"){google.charts.setOnLoadCallback(drawGauge_pressure);}
+           if(getCookie("load_lux")=="1"){google.charts.setOnLoadCallback(drawGauge_lux);}
+           if(getCookie("load_eco")=="1"){google.charts.setOnLoadCallback(drawGauge_eco2);}
+           if(getCookie("load_tvoc")=="1"){google.charts.setOnLoadCallback(drawGauge_tvoc);}
            
           function drawGauge_humidity(){
                          
@@ -557,21 +590,51 @@
       <div class="main">
          <table>
             <tr>
-               <td><div id="gauge_humidity" class="chartGauge"></div></td>
-               <td><div id="gauge_temperature" class="chartGauge"></div></td>
-               <td><div id="gauge_heatIndex" class="chartGauge"></div></td>
-               <td><div id="gauge_pressure" class="chartGauge"></div></td>
-               <td><div id="gauge_lux" class="chartGauge"></div></td>
-               <td><div id="gauge_eco2" class="chartGauge"></div></td>
-               <td><div id="gauge_tvoc" class="chartGauge"></div></td>
+               <?php
+                  if ($_COOKIE['load_humidity'] == "1"){
+                        echo '<td><div id="gauge_humidity" class="chartGauge"></div></td>';
+                  }
+                  if ($_COOKIE['load_temperature'] == "1"){
+                        echo '<td><div id="gauge_temperature" class="chartGauge"></div></td>';
+                  }
+                  if ($_COOKIE['load_heatindex'] == "1"){
+                        echo '<td><div id="gauge_heatIndex" class="chartGauge"></div></td>';
+                  }
+                  if ($_COOKIE['load_pressure'] == "1"){
+                        echo '<td><div id="gauge_pressure" class="chartGauge"></div></td>';
+                  }
+                  if ($_COOKIE['load_lux'] == "1"){
+                        echo '<td><div id="gauge_lux" class="chartGauge"></div></td>';
+                  }
+                  if ($_COOKIE['load_eco'] == "1"){
+                        echo '<td><div id="gauge_eco2" class="chartGauge"></div></td>';
+                  }
+                  if ($_COOKIE['load_tvoc'] == "1"){
+                        echo '<td><div id="gauge_tvoc" class="chartGauge"></div></td>';
+                  }
+               ?>
             </tr>
          </table>
-                     <div id="Chart_humidity" class="chartAnnotationChart"></div></td>
-                     <div id="Chart_temperature" class="chartAnnotationChart"></div></td>
-                     <div id="Chart_pressure" class="chartAnnotationChart"></div></td>
-                     <div id="Chart_lux" class="chartAnnotationChart"></div></td>
-                     <div id="Chart_eco2" class="chartAnnotationChart"></div></td>
-                     <div id="Chart_tvoc" class="chartAnnotationChart"></div></td>
+            <?php
+            if ($_COOKIE['load_humidity'] == "1"){
+                  echo '<div id="Chart_humidity" class="chartAnnotationChart"></div>';
+            }
+            if ($_COOKIE['load_temperature'] == "1"){
+                  echo '<div id="Chart_temperature" class="chartAnnotationChart"></div>';
+            }
+            if ($_COOKIE['load_pressure'] == "1"){
+                  echo '<div id="Chart_pressure" class="chartAnnotationChart"></div>';
+            }
+            if ($_COOKIE['load_lux'] == "1"){
+                  echo '<div id="Chart_lux" class="chartAnnotationChart"></div>';
+            }
+            if ($_COOKIE['load_eco'] == "1"){
+                  echo '<div id="Chart_eco2" class="chartAnnotationChart"></div>';
+            }
+            if ($_COOKIE['load_tvoc'] == "1"){
+                  echo '<div id="Chart_tvoc" class="chartAnnotationChart"></div>';
+            }
+            ?>
       </div>
       <footer>
          <span><b>Mail:</b> <a href="mailto:skirch1@alumno.uned.es">skirch1@alumno.uned.es</a></span>
